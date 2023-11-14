@@ -1,39 +1,70 @@
-<!--
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# Easy Data Table
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages).
+[![pub package](https://img.shields.io/pub/v/easy_data_table?label=pub.dev&labelColor=333940&logo=dart)](https://pub.dev/packages/easy_data_table)
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages).
--->
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+`easy_data_table` is a simple and efficient way to use data tables in Flutter.
+
+![Image Demo](example/example.png)
 
 ## Features
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+- **Simplified Data Tables**, Easily create data tables with minimal code.
+- **Selection**, Enable row selection with a checkbox column.
+- **Customization** Customize appearance with various options.
+- **Pagination** Implement pagination for large datasets
+- **Sorting** by predefined columns
 
-## Getting started
+## Get Started
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+To use this package, follow these steps:
+
+### 1. Depend on it
+
+Add this to your package's `pubspec.yaml` file:
+
+```bash
+flutter pub add easy_data_table
+```
+
+### 2. Import it
+
+Add this import to your Dart code:
+
+```dart
+import 'package:easy_data_table/easy_data_table.dart';
+```
+
 
 ## Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
+Using `easy_data_table` is straightforward. Create a DataTable widget with your data:
 
 ```dart
-const like = 'sample';
+EasyDataTable<YourDataModel>(
+  columns: [
+    EasyColumn(headerText: 'ID', ...),
+    EasyColumn(headerText: 'Name', ...),
+    EasyColumn(headerText: 'Age', ...),
+  ],
+  rows: [
+    // Populate your data
+    // Example: YourDataModel(id: 1, name: 'John Doe', age: 25),
+    // Example: YourDataModel(id: 2, name: 'Jane Doe', age: 30),
+  ],
+)
 ```
 
-## Additional information
+## FAQ
 
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+### Q: How do I customize the appearance of cells?
+A: You can use the `EasyColumn` options such as `cellWidgetBuilder`, `textAlign`, and `width` to customize cell appearance.
+
+## Support and Contact
+
+- Email: [omasuaku@gmail.com](mailto:omasuaku@gmail.com)
+- Github: [oseeshogun](https://github.com/oseeshogun)
+
+## Contribute
+
+Any suggestion to improve/add is welcome, if you want to make a PR, you are welcome :)
