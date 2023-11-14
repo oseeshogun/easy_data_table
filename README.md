@@ -5,7 +5,7 @@
 
 `easy_data_table` is a simple and efficient way to use data tables in Flutter.
 
-![Image Demo](example/example.png)
+<img src="example/example.png" alt="Image Demo" style="width:150px;"/>
 
 ## Features
 
