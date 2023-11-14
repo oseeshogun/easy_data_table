@@ -81,6 +81,7 @@ class _MyHomePageState extends State<MyHomePage> {
             EasyColumn(
               headerText: 'City',
               cellText: (person, i) => person.city,
+              textAlign: TextAlign.left
             ),
           ],
           rows: persons,

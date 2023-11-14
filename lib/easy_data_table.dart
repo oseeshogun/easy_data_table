@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'src/utils.dart';
+import 'src/widgets/empty.dart';
 
 part 'src/easy_column.dart';
 
@@ -12,7 +13,7 @@ class EasyDataTable<T> extends StatefulWidget {
   final List<EasyColumn<T>> columns;
   final List<T> rows;
   final TextAlign textAlign;
-  final Color? iconColor;
+  final Color? headerIconColor;
   final bool showCheckboxColumn;
   final MaterialStateProperty<Color?>? headingRowColor;
   final TextStyle? headingTextStyle;
@@ -21,13 +22,14 @@ class EasyDataTable<T> extends StatefulWidget {
   final void Function(bool?, T item)? onSelectChanged;
   final List<T> selectedRows;
   final Color? selectedRowColor;
+  final Widget Function(BuildContext context)? emptyItemBuilder;
 
   const EasyDataTable({
     super.key,
     required this.columns,
     required this.rows,
     this.textAlign = TextAlign.center,
-    this.iconColor,
+    this.headerIconColor,
     this.showCheckboxColumn = true,
     this.headingRowColor,
     this.headingTextStyle,
@@ -36,6 +38,7 @@ class EasyDataTable<T> extends StatefulWidget {
     this.onSelectChanged,
     this.selectedRows = const [],
     this.selectedRowColor,
+    this.emptyItemBuilder,
   });
 
   @override
@@ -48,7 +51,7 @@ class _EasyDataTableState<T> extends State<EasyDataTable<T>> {
 
   @override
   Widget build(BuildContext context) {
-    final List<T> rows = widget.rows;
+    final List<T> rows = [...widget.rows];
 
     if (_currentSortColumn != null) {
       rows.sort((a, b) {
@@ -63,7 +66,7 @@ class _EasyDataTableState<T> extends State<EasyDataTable<T>> {
 
     final dataTable = Theme(
       data: Theme.of(context).copyWith(
-        iconTheme: Theme.of(context).iconTheme.copyWith(color: widget.iconColor),
+        iconTheme: Theme.of(context).iconTheme.copyWith(color: widget.headerIconColor ?? headingTextStyle.color),
       ),
       child: DataTable(
         showCheckboxColumn: widget.showCheckboxColumn,
@@ -142,10 +145,15 @@ class _EasyDataTableState<T> extends State<EasyDataTable<T>> {
     );
 
     return SingleChildScrollView(
-      child: SingleChildScrollView(
-        padding: widget.horizontalPadding,
-        scrollDirection: Axis.horizontal,
-        child: SizedBox(child: dataTable),
+      child: Column(
+        children: [
+          SingleChildScrollView(
+            padding: widget.horizontalPadding,
+            scrollDirection: Axis.horizontal,
+            child: SizedBox(child: dataTable),
+          ),
+          if (rows.isEmpty) widget.emptyItemBuilder?.call(context) ?? const EasyDataTableEmptyWidget(),
+        ],
       ),
     );
   }
