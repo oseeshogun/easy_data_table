@@ -1,30 +1,33 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
+import 'package:easy_data_table/easy_data_table.dart';
+import 'package:example/main.dart';
+import 'package:example/person.dart'; // Make sure to import the Person class
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:example/main.dart';
-
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+  testWidgets('EasyDataTable should render correctly', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const MyApp());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // Verify that the EasyDataTable widget renders correctly.
+    expect(find.byType(EasyDataTable<Person>), findsOneWidget);
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+  testWidgets('Selecting a row should update the selected list', (WidgetTester tester) async {
+    // Build our app and trigger a frame.
+    await tester.pumpWidget(const MyApp());
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    tester.runAsync(() async {
+      // Initial state: No rows selected
+      expect(find.text('Selected: 0'), findsOneWidget);
+
+      // Tap on the first row
+      await tester.tap(find.text('John Doe'));
+      await tester.pump();
+
+      // After tapping, the selected list should have one item
+      expect(find.text('Selected: 1'), findsOneWidget);
+    });
   });
 }
+
+// You can also write additional unit tests for other functions or classes in your codebase.
