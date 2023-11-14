@@ -1,6 +1,6 @@
 name: easy_data_table
 description: A simple and efficient way to use data tables in Flutter.
-version: 0.0.1
+version: 0.0.2
 homepage: https://github.com/oseeshogun/easy_data_table
 
 environment:
