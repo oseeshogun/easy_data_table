@@ -1,6 +1,7 @@
 library easy_data_table;
 
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 
@@ -8,6 +9,7 @@ import 'src/utils.dart';
 import 'src/widgets/empty.dart';
 
 part 'src/easy_column.dart';
+part 'src/widgets/easy_table_pagination.dart';
 
 class EasyDataTable<T> extends StatefulWidget {
   final List<EasyColumn<T>> columns;
@@ -23,6 +25,12 @@ class EasyDataTable<T> extends StatefulWidget {
   final List<T> selectedRows;
   final Color? selectedRowColor;
   final Widget Function(BuildContext context)? emptyItemBuilder;
+  final FutureOr<void> Function(T item)? onRowLongPress;
+  final List<int> avaibleRowsPerPage;
+  final int rowsPerPage;
+  final int currentPage;
+  final bool? showBottomBorder;
+  final Widget Function(BuildContext context)? paginatorBuilder;
 
   const EasyDataTable({
     super.key,
@@ -39,6 +47,12 @@ class EasyDataTable<T> extends StatefulWidget {
     this.selectedRows = const [],
     this.selectedRowColor,
     this.emptyItemBuilder,
+    this.onRowLongPress,
+    this.rowsPerPage = 50,
+    this.avaibleRowsPerPage = const [10, 25, 50, 100],
+    this.currentPage = 1,
+    this.showBottomBorder,
+    this.paginatorBuilder,
   });
 
   @override
@@ -51,38 +65,36 @@ class _EasyDataTableState<T> extends State<EasyDataTable<T>> {
 
   @override
   Widget build(BuildContext context) {
-    final List<T> rows = [...widget.rows];
+    final List<T> allRows = [...widget.rows];
 
     if (_currentSortColumn != null) {
-      rows.sort((a, b) {
-        return widget.columns[_currentSortColumn!].sort
-                ?.call(a, b, _isAscending) ??
-            0;
+      allRows.sort((a, b) {
+        return widget.columns[_currentSortColumn!].sort?.call(a, b, _isAscending) ?? 0;
       });
     }
 
+    // pagination logic
+    final startIndex = min((widget.currentPage - 1) * widget.rowsPerPage, allRows.length - 1 - widget.rowsPerPage);
+    final endIndex = startIndex + widget.rowsPerPage;
+    final rows = allRows.sublist(max(0, startIndex), endIndex > allRows.length ? allRows.length : endIndex);
+
     final headingTextStyle = widget.headingTextStyle ??
         TextStyle(
-          color: calculateTextColor(
-              widget.headingRowColor?.resolve({MaterialState.pressed}) ??
-                  Theme.of(context).primaryColor),
+          color: calculateTextColor(widget.headingRowColor?.resolve({MaterialState.pressed}) ?? Theme.of(context).primaryColor),
         );
 
     final dataTable = Theme(
       data: Theme.of(context).copyWith(
-        iconTheme: Theme.of(context)
-            .iconTheme
-            .copyWith(color: widget.headerIconColor ?? headingTextStyle.color),
+        iconTheme: Theme.of(context).iconTheme.copyWith(color: widget.headerIconColor ?? headingTextStyle.color),
       ),
       child: DataTable(
         showCheckboxColumn: widget.showCheckboxColumn,
-        headingRowColor: widget.headingRowColor ??
-            MaterialStatePropertyAll(Theme.of(context).primaryColor),
+        headingRowColor: widget.headingRowColor ?? MaterialStatePropertyAll(Theme.of(context).primaryColor),
         headingTextStyle: headingTextStyle,
-        dataRowColor: widget.dataRowColor ??
-            const MaterialStatePropertyAll(Color.fromRGBO(241, 240, 240, 1)),
+        dataRowColor: widget.dataRowColor ?? const MaterialStatePropertyAll(Color.fromRGBO(241, 240, 240, 1)),
         sortColumnIndex: _currentSortColumn,
         sortAscending: _isAscending,
+        showBottomBorder: widget.showBottomBorder ?? (allRows.length > widget.rowsPerPage),
         columns: widget.columns
             .map(
               (column) => DataColumn(
@@ -109,18 +121,12 @@ class _EasyDataTableState<T> extends State<EasyDataTable<T>> {
         rows: rows.asMap().entries.map((entry) {
           final index = entry.key;
           final row = entry.value;
-          final rowColor = widget.selectedRows.contains(row)
-              ? (widget.selectedRowColor ??
-                  const Color.fromARGB(255, 65, 158, 224).withOpacity(0.3))
-              : null;
+          final rowColor = widget.selectedRows.contains(row) ? (widget.selectedRowColor ?? const Color.fromARGB(255, 65, 158, 224).withOpacity(0.3)) : null;
           return DataRow(
-            selected: widget.showCheckboxColumn
-                ? widget.selectedRows.contains(row)
-                : false,
+            onLongPress: () => widget.onRowLongPress?.call(row),
+            selected: widget.showCheckboxColumn ? widget.selectedRows.contains(row) : false,
             color: MaterialStatePropertyAll(rowColor),
-            onSelectChanged: widget.showCheckboxColumn
-                ? (value) => widget.onSelectChanged?.call(value, row)
-                : null,
+            onSelectChanged: widget.showCheckboxColumn ? (value) => widget.onSelectChanged?.call(value, row) : null,
             cells: widget.columns.map<DataCell>((column) {
               return DataCell(
                 SizedBox(
@@ -131,15 +137,12 @@ class _EasyDataTableState<T> extends State<EasyDataTable<T>> {
                     builder: (context, snapshot) {
                       if (column.cellWidgetBuilder != null) {
                         return FutureBuilder<Widget?>(
-                          future: Future.value(
-                              column.cellWidgetBuilder?.call(row, index)),
+                          future: Future.value(column.cellWidgetBuilder?.call(row, index)),
                           initialData: const SizedBox(),
-                          builder: (context, snapshot) =>
-                              snapshot.data ?? const SizedBox(),
+                          builder: (context, snapshot) => snapshot.data ?? const SizedBox(),
                         );
                       }
-                      if ((column.textAlign ?? widget.textAlign) !=
-                          TextAlign.center) {
+                      if ((column.textAlign ?? widget.textAlign) != TextAlign.center) {
                         return Text(
                           snapshot.data ?? '',
                           textAlign: column.textAlign ?? widget.textAlign,
@@ -163,17 +166,14 @@ class _EasyDataTableState<T> extends State<EasyDataTable<T>> {
     );
 
     return SingleChildScrollView(
-      child: Column(
-        children: [
-          SingleChildScrollView(
-            padding: widget.horizontalPadding,
-            scrollDirection: Axis.horizontal,
-            child: SizedBox(child: dataTable),
-          ),
-          if (rows.isEmpty)
-            widget.emptyItemBuilder?.call(context) ??
-                const EasyDataTableEmptyWidget(),
-        ],
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(child: dataTable),
+            if (allRows.length > widget.rowsPerPage) widget.paginatorBuilder?.call(context) ?? const SizedBox(),
+            if (rows.isEmpty) widget.emptyItemBuilder?.call(context) ?? const EasyDataTableEmptyWidget(),
+          ],
+        ),
       ),
     );
   }
