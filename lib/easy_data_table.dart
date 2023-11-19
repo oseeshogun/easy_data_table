@@ -55,24 +55,32 @@ class _EasyDataTableState<T> extends State<EasyDataTable<T>> {
 
     if (_currentSortColumn != null) {
       rows.sort((a, b) {
-        return widget.columns[_currentSortColumn!].sort?.call(a, b, _isAscending) ?? 0;
+        return widget.columns[_currentSortColumn!].sort
+                ?.call(a, b, _isAscending) ??
+            0;
       });
     }
 
     final headingTextStyle = widget.headingTextStyle ??
         TextStyle(
-          color: calculateTextColor(widget.headingRowColor?.resolve({MaterialState.pressed}) ?? Theme.of(context).primaryColor),
+          color: calculateTextColor(
+              widget.headingRowColor?.resolve({MaterialState.pressed}) ??
+                  Theme.of(context).primaryColor),
         );
 
     final dataTable = Theme(
       data: Theme.of(context).copyWith(
-        iconTheme: Theme.of(context).iconTheme.copyWith(color: widget.headerIconColor ?? headingTextStyle.color),
+        iconTheme: Theme.of(context)
+            .iconTheme
+            .copyWith(color: widget.headerIconColor ?? headingTextStyle.color),
       ),
       child: DataTable(
         showCheckboxColumn: widget.showCheckboxColumn,
-        headingRowColor: widget.headingRowColor ?? MaterialStatePropertyAll(Theme.of(context).primaryColor),
+        headingRowColor: widget.headingRowColor ??
+            MaterialStatePropertyAll(Theme.of(context).primaryColor),
         headingTextStyle: headingTextStyle,
-        dataRowColor: widget.dataRowColor ?? const MaterialStatePropertyAll(Color.fromRGBO(241, 240, 240, 1)),
+        dataRowColor: widget.dataRowColor ??
+            const MaterialStatePropertyAll(Color.fromRGBO(241, 240, 240, 1)),
         sortColumnIndex: _currentSortColumn,
         sortAscending: _isAscending,
         columns: widget.columns
@@ -101,11 +109,18 @@ class _EasyDataTableState<T> extends State<EasyDataTable<T>> {
         rows: rows.asMap().entries.map((entry) {
           final index = entry.key;
           final row = entry.value;
-          final rowColor = widget.selectedRows.contains(row) ? (widget.selectedRowColor ?? const Color.fromARGB(255, 65, 158, 224).withOpacity(0.3)) : null;
+          final rowColor = widget.selectedRows.contains(row)
+              ? (widget.selectedRowColor ??
+                  const Color.fromARGB(255, 65, 158, 224).withOpacity(0.3))
+              : null;
           return DataRow(
-            selected: widget.showCheckboxColumn ? widget.selectedRows.contains(row) : false,
+            selected: widget.showCheckboxColumn
+                ? widget.selectedRows.contains(row)
+                : false,
             color: MaterialStatePropertyAll(rowColor),
-            onSelectChanged: widget.showCheckboxColumn ? (value) => widget.onSelectChanged?.call(value, row) : null,
+            onSelectChanged: widget.showCheckboxColumn
+                ? (value) => widget.onSelectChanged?.call(value, row)
+                : null,
             cells: widget.columns.map<DataCell>((column) {
               return DataCell(
                 SizedBox(
@@ -116,12 +131,15 @@ class _EasyDataTableState<T> extends State<EasyDataTable<T>> {
                     builder: (context, snapshot) {
                       if (column.cellWidgetBuilder != null) {
                         return FutureBuilder<Widget?>(
-                          future: Future.value(column.cellWidgetBuilder?.call(row, index)),
+                          future: Future.value(
+                              column.cellWidgetBuilder?.call(row, index)),
                           initialData: const SizedBox(),
-                          builder: (context, snapshot) => snapshot.data ?? const SizedBox(),
+                          builder: (context, snapshot) =>
+                              snapshot.data ?? const SizedBox(),
                         );
                       }
-                      if ((column.textAlign ?? widget.textAlign) != TextAlign.center) {
+                      if ((column.textAlign ?? widget.textAlign) !=
+                          TextAlign.center) {
                         return Text(
                           snapshot.data ?? '',
                           textAlign: column.textAlign ?? widget.textAlign,
@@ -152,7 +170,9 @@ class _EasyDataTableState<T> extends State<EasyDataTable<T>> {
             scrollDirection: Axis.horizontal,
             child: SizedBox(child: dataTable),
           ),
-          if (rows.isEmpty) widget.emptyItemBuilder?.call(context) ?? const EasyDataTableEmptyWidget(),
+          if (rows.isEmpty)
+            widget.emptyItemBuilder?.call(context) ??
+                const EasyDataTableEmptyWidget(),
         ],
       ),
     );

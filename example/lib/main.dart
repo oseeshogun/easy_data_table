@@ -79,10 +79,9 @@ class _MyHomePageState extends State<MyHomePage> {
               cellText: (person, i) => person.height.toStringAsFixed(2),
             ),
             EasyColumn(
-              headerText: 'City',
-              cellText: (person, i) => person.city,
-              textAlign: TextAlign.left
-            ),
+                headerText: 'City',
+                cellText: (person, i) => person.city,
+                textAlign: TextAlign.left),
           ],
           rows: persons,
         ),

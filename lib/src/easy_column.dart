@@ -74,7 +74,8 @@ class EasyColumn<T> {
   final int Function(T a, T b, bool ascending)? _order;
 
   /// Sort Function
-  int Function(T a, T b, bool ascending)? get sort => _order ?? EasyColumn._defaultSortFunction;
+  int Function(T a, T b, bool ascending)? get sort =>
+      _order ?? EasyColumn._defaultSortFunction;
 
   static int _defaultSortFunction<T>(T a, T b, bool ascending) {
     if (ascending) {

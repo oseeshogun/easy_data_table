@@ -4,7 +4,8 @@ import 'package:example/person.dart'; // Make sure to import the Person class
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('EasyDataTable should render correctly', (WidgetTester tester) async {
+  testWidgets('EasyDataTable should render correctly',
+      (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const MyApp());
 
@@ -12,7 +13,8 @@ void main() {
     expect(find.byType(EasyDataTable<Person>), findsOneWidget);
   });
 
-  testWidgets('Selecting a row should update the selected list', (WidgetTester tester) async {
+  testWidgets('Selecting a row should update the selected list',
+      (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const MyApp());
 
