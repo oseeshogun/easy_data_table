@@ -9,7 +9,7 @@ class EasyTablePagination extends StatelessWidget {
     required this.count,
     required this.onPageChange,
     required this.onRowsPerPageChange,
-  })  : assert((count ~/ rowsPerPage) + 1 > page, "Page is bigger than it can be"),
+  })  : assert((count / rowsPerPage).ceil() + 1 > page, "Page is bigger than it can be"),
         assert(rowsPerPageOptions.contains(rowsPerPage), "rowsPerPageOptions must contain rowsPerPage");
 
   final int count;
@@ -22,7 +22,7 @@ class EasyTablePagination extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final startIndex = (page - 1) * rowsPerPage;
-    final endIndex = startIndex + rowsPerPage;
+    final endIndex = startIndex + rowsPerPage > count - 1 ? count : startIndex + rowsPerPage;
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -43,7 +43,8 @@ class EasyTablePagination extends StatelessWidget {
                 .toList(),
             onChanged: (value) {
               if (value != null) {
-                onPageChange(1);
+                final newPage = ((startIndex + 1) / value).ceil();
+                onPageChange(newPage);
                 onRowsPerPageChange(value);
               }
             },
@@ -57,7 +58,7 @@ class EasyTablePagination extends StatelessWidget {
             iconSize: 18,
           ),
           IconButton(
-            onPressed: () => onPageChange(min(page + 1, count ~/ rowsPerPage)),
+            onPressed: () => onPageChange(min(page + 1, (count / rowsPerPage).ceil())),
             icon: const Icon(Icons.arrow_forward_ios),
             iconSize: 18,
           ),

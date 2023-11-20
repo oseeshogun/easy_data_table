@@ -101,7 +101,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           page: page,
                           onPageChange: (int value) => setState(() => (page = value)),
                           onRowsPerPageChange: (value) => setState(() => (rowsPerPage = value)),
-                          rowsPerPageOptions: const [3, 10, 30],
+                          rowsPerPageOptions: const [3, 10, 15, 30],
                         ),
                       );
                     }),

@@ -74,7 +74,7 @@ class _EasyDataTableState<T> extends State<EasyDataTable<T>> {
     }
 
     // pagination logic
-    final startIndex = min((widget.currentPage - 1) * widget.rowsPerPage, allRows.length - 1 - widget.rowsPerPage);
+    final startIndex = max(0, (widget.currentPage - 1) * widget.rowsPerPage);
     final endIndex = startIndex + widget.rowsPerPage;
     final rows = allRows.sublist(max(0, startIndex), endIndex > allRows.length ? allRows.length : endIndex);
 
